@@ -22,8 +22,8 @@ function writePassword() {
   }
 }
 
+// Main function that calls the functions that validates the password length, character choice, and randomisation of characters
 function generatePassword() {
-  // Main function that calls the functions that validates the password length, character choice, and randomisation of characters
   // Initialise both password and optionsArray to blank
   optionsArray = '';
   passwd = '';
@@ -39,6 +39,7 @@ function generatePassword() {
   // Function for creating the character choice string to use for password
   optionsArray = createUserChoiceArray()
   
+  // If there is no character choice, return false
   if (optionsArray.length < 1) {
     return false;
   }
@@ -50,18 +51,19 @@ function generatePassword() {
 
 function validateUserEntry() {
   var length = window.prompt("Length of password (8-128)", "8");
+  
   // Keep prompting until user enters a valid length value
-  // the last condition catches the non-numeric values (length should be a number that is not NaN)
-  while (length < 8 || length > 128 || !(typeof (length*1) === 'number' && !isNaN(length*1))) {
-    //catches the case where the user clicks cancel in the middle of the loop
+  // value is invalid for the following cases:
+  // - if the value is less than 8, or
+  // - if the value is more than 128, or
+  // - if the user clicked cancel (so the output of the prompt is NULL), or
+  // - if the user entered a non-numeric value (length*1 (multiplying it to 1 converts the string into a number) should be a number that is not NaN)
+  while (length < 8 || length > 128 || length === null || !(typeof (length*1) === 'number' && !isNaN(length*1))) {
+    // If the user clicked cancel, return -1
     if (length === null) {
       return -1;
     }
     length = window.prompt("Invalid input '" +length+"'\n\nLength of password (8-128)", "8")
-  }
-  
-  if (length === null) {
-    return -1;
   }
 
   return length;
@@ -75,7 +77,7 @@ function createUserChoiceArray() {
   }
 
   // create the character selection array
-  // This is done outside the checkUserChoices function so that it is surely a valid choice
+  // This is done outside the checkUserChoices function so that it is sure that the combination is valid
   if (includeLowerCase) {
     optionsArray += lowerCase;
   }
@@ -95,24 +97,25 @@ function createUserChoiceArray() {
   return optionsArray;
 }
 
-function generatePW(length) {
-  var passwd = '';  
-  for (var i = 0; i < length; i++) {
-    // get the nth character of the optionsArray string where n is a random number from 0 to optionsArray.length-1
-    passwd += optionsArray.charAt(Math.abs(Math.floor(Math.random() * optionsArray.length)));
-  }
-  return passwd;
-}
-
 function checkUserChoices() {
-  // Store user's character choices
+  // Store user's character choices to the global vars that would determine if they should be included in the optionsArray string
   includeLowerCase = (window.confirm("Do you want the password to have lower case characters?")) ? true : false
   includeUpperCase = (window.confirm("Do you want the password to have upper case characters?")) ? true : false
   includeNumeric = (window.confirm("Do you want the password to have numeric values?")) ? true : false
   includeSpecialChars = (window.confirm("Do you want the password to have special characters?")) ? true : false
 
-  // return the combination of the choices; will return true if at least one is selected
+  // return the combination of the stored choices; will return true if at least one is selected
   return (includeLowerCase || includeUpperCase || includeNumeric || includeSpecialChars)
+}
+
+function generatePW(length) {
+  // create a local variable where the random characters would be stored before it completes the loop
+  var passwd = '';  
+  for (var i = 0; i < length; i++) {
+    // get the nth character of the optionsArray string where n is a random number from 0 to optionsArray.length
+    passwd += optionsArray.charAt(Math.abs(Math.floor(Math.random() * optionsArray.length)));
+  }
+  return passwd;
 }
 
 // Add event listener to generate button
